@@ -1,0 +1,93 @@
+number of points: 98304
+All Base OTs Done
+he0 ok
+65536
+> HE instance initialized: 
+-> Poly Mod Degree: 32768
+-> Coeff Mod: fft_scale: 20
+60 34 60 60 60 60 60 
+he1 ok
+65536
+> HE instance initialized: 
+-> Poly Mod Degree: 32768
+-> Coeff Mod: fft_scale: 20
+60 60 60 60 60 60 60 
+he2 ok
+65536
+> HE instance initialized: 
+-> Poly Mod Degree: 32768
+-> Coeff Mod: fft_scale: 20
+60 32 60 60 60 60 60 60 
+he3 ok
+32768
+> HE instance initialized: 
+-> Poly Mod Degree: 16384
+-> Coeff Mod: fft_scale: 20
+60 34 60 60 60 60 
+65536
+> HE instance initialized: 
+-> Poly Mod Degree: 32768
+-> Coeff Mod: fft_scale: 20
+60 40 40 40 40 40 40 40 60 
+16384
+> HE instance initialized: 
+-> Poly Mod Degree: 8192
+-> Coeff Mod: fft_scale: 20
+60 40 60 
+65536
+> HE instance initialized: 
+-> Poly Mod Degree: 32768
+-> Coeff Mod: fft_scale: 20
+60 60 60 60 60 
+he initial ok
+> Setup Linear OK
+using PCG ot-extension
+warm up
+warm up
+> Setup NonLinear OK
+> Loading and preprocessing weights on server
+> [TIMING]: Loading Model takes: 5.44806sec
+Preprocessing layer 0
+half done
+> [TIMING]: Model Preprocessing takes: 0.105625sec
+c_offline:1726247, r_offline:10
+> Bert intialized done!
+
+> Bert_ckks intialized done!
+
+in layer_norm_nonlinear, bitwidth,s,num_ops,dim:40,20,128,768
+sigma.size, should be L:128
+look up 1
+look up 1.1
+layer_norm_part1 comm:354032
+layer_norm_part1 round:197
+in ln_part2_linear3_gelu_part1, bitwidth,s:40,20
+should be 0! comm:0, round:0
+in mpc_to_ckks, slot, Q, bitwidth, s_in, s_out:16384,808101481108078593,40,20,46
+in mpc_to_ckks, slot, Q, bitwidth, s_in, s_out:16384,808101481108078593,40,20,46
+cts.size() * n1: 48
+cts.size() * n2, data.image_size * data.filter_w / data.slot_count, n1: 24,24,8
+bert_cp_bsgs_2 time:2.7546
+num_cts:24
+poly1~4 scale:
+76,7.55579e+22
+76,7.55579e+22
+76,7.55579e+22
+76,7.55579e+22
+part2 ok
+gelu poly time:0.683176
+eval_gelu_poly done
+in ckks_to_mpc, degree, Q, bit_out, s_in, s_out:32768,1152921504592822273,40,30,20
+chunk_size, ell,s:393216,40,20
+gelu time:59.6815
+fusion comm:1.0111e+08
+fusion round:31
+total time:65.5424
+-----------comm------------
+ct_transfer_comm:6.2932e+06
+conversion_comm:1.96616e+06
+other_nonlinear_comm:9.28511e+07
+-----------round------------
+ct_transfer_round:2
+conversion_round:10
+other_nonlinear_round:19

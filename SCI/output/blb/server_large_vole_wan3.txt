@@ -1,0 +1,520 @@
+number of points: 98304
+All Base OTs Done
+he0 ok
+65536
+> HE instance initialized: 
+-> Poly Mod Degree: 32768
+-> Coeff Mod: fft_scale: 20
+60 34 60 60 60 60 60 
+he1 ok
+65536
+> HE instance initialized: 
+-> Poly Mod Degree: 32768
+-> Coeff Mod: fft_scale: 20
+60 60 60 60 60 60 60 
+he2 ok
+65536
+> HE instance initialized: 
+-> Poly Mod Degree: 32768
+-> Coeff Mod: fft_scale: 20
+60 32 60 60 60 60 60 60 
+he3 ok
+32768
+> HE instance initialized: 
+-> Poly Mod Degree: 16384
+-> Coeff Mod: fft_scale: 20
+60 34 60 60 60 60 
+65536
+> HE instance initialized: 
+-> Poly Mod Degree: 32768
+-> Coeff Mod: fft_scale: 20
+60 40 40 40 40 40 40 40 60 
+16384
+> HE instance initialized: 
+-> Poly Mod Degree: 8192
+-> Coeff Mod: fft_scale: 20
+60 40 60 
+65536
+> HE instance initialized: 
+-> Poly Mod Degree: 32768
+-> Coeff Mod: fft_scale: 20
+60 60 60 60 60 
+he initial ok
+> Setup Linear OK
+using PCG ot-extension
+warm up
+warm up
+using PCG ot-extension
+warm up
+warm up
+using PCG ot-extension
+warm up
+warm up
+using PCG ot-extension
+warm up
+warm up
+using PCG ot-extension
+warm up
+warm up
+using PCG ot-extension
+warm up
+warm up
+using PCG ot-extension
+warm up
+warm up
+using PCG ot-extension
+warm up
+warm up
+using PCG ot-extension
+warm up
+warm up
+using PCG ot-extension
+warm up
+warm up
+using PCG ot-extension
+warm up
+warm up
+using PCG ot-extension
+warm up
+warm up
+using PCG ot-extension
+warm up
+warm up
+using PCG ot-extension
+warm up
+warm up
+using PCG ot-extension
+warm up
+warm up
+using PCG ot-extension
+warm up
+warm up
+using PCG ot-extension
+warm up
+warm up
+using PCG ot-extension
+warm up
+warm up
+using PCG ot-extension
+warm up
+warm up
+using PCG ot-extension
+warm up
+warm up
+using PCG ot-extension
+warm up
+warm up
+using PCG ot-extension
+warm up
+warm up
+using PCG ot-extension
+warm up
+warm up
+using PCG ot-extension
+warm up
+warm up
+using PCG ot-extension
+warm up
+warm up
+using PCG ot-extension
+warm up
+warm up
+using PCG ot-extension
+warm up
+warm up
+using PCG ot-extension
+warm up
+warm up
+using PCG ot-extension
+warm up
+warm up
+using PCG ot-extension
+warm up
+warm up
+using PCG ot-extension
+warm up
+warm up
+using PCG ot-extension
+warm up
+warm up
+using PCG ot-extension
+warm up
+warm up
+using PCG ot-extension
+warm up
+warm up
+using PCG ot-extension
+warm up
+warm up
+using PCG ot-extension
+warm up
+warm up
+using PCG ot-extension
+warm up
+warm up
+using PCG ot-extension
+warm up
+warm up
+using PCG ot-extension
+warm up
+warm up
+using PCG ot-extension
+warm up
+warm up
+using PCG ot-extension
+warm up
+warm up
+using PCG ot-extension
+warm up
+warm up
+using PCG ot-extension
+warm up
+warm up
+using PCG ot-extension
+warm up
+warm up
+using PCG ot-extension
+warm up
+warm up
+using PCG ot-extension
+warm up
+warm up
+using PCG ot-extension
+warm up
+warm up
+using PCG ot-extension
+warm up
+warm up
+using PCG ot-extension
+warm up
+warm up
+using PCG ot-extension
+warm up
+warm up
+using PCG ot-extension
+warm up
+warm up
+using PCG ot-extension
+warm up
+warm up
+using PCG ot-extension
+warm up
+warm up
+using PCG ot-extension
+warm up
+warm up
+using PCG ot-extension
+warm up
+warm up
+using PCG ot-extension
+warm up
+warm up
+using PCG ot-extension
+warm up
+warm up
+using PCG ot-extension
+warm up
+warm up
+using PCG ot-extension
+warm up
+warm up
+using PCG ot-extension
+warm up
+warm up
+using PCG ot-extension
+warm up
+warm up
+using PCG ot-extension
+warm up
+warm up
+using PCG ot-extension
+warm up
+warm up
+using PCG ot-extension
+warm up
+warm up
+> Setup NonLinear OK
+> Loading and preprocessing weights on server
+> [TIMING]: Loading Model takes: 6.85152sec
+Preprocessing layer 0
+half done
+> [TIMING]: Model Preprocessing takes: 0.207625sec
+c_offline:110479808, r_offline:10
+> Bert intialized done!
+
+> Bert_ckks intialized done!
+
+begin test
+in layer_norm_nonlinear, bitwidth,s,num_ops,dim:40,20,128,1024
+sigma.size, should be L:128
+bert_ckks.other_nonlinear_comm:0
+-----------comm------------
+ct_transfer_comm:0
+conversion_comm:0
+other_nonlinear_comm:0
+total comm:0
+-----------latency------------
+ct_transfer_time:0
+conversion_time:0
+other_nonlinear_time:0.00234363
+he_compute_time:0
+total time:0.00234363
+-----------end profile------------
+--------layer_norm_nonlinear done--------
+should be 0! comm:0, round:0
+0
+0
+in mpc_to_ckks, slot, Q, bitwidth, s_in, s_out:16384,262074192769122305,40,20,44
+in mpc_to_ckks, slot, Q, bitwidth, s_in, s_out:16384,262074192769122305,40,20,44
+num of input cts:16
+bitwidth of input ct:6
+recv_encrypted_vector
+*w+b time:0.131693
+scale:72
+(x_avg * sigma) * w + b done
+input_cts.size: 8
+bert_cipher_plain_bsgs done
+attention part1 time:5.41645
+scale after WX: 56
+bert_cipher_plain_bsgs done
+scale: 40
+num rotations: 0
+cmul: 2048
+qk time:2.91847
+attention total time:8.35528
+qkv_scale:30
+Q:60
+scale:30
+block 2 time:8.517
+num of output cts:24
+bitwidth of output ct:1
+in ckks_to_mpc, degree, Q, bit_out, s_in, s_out:32768,1152921504593412097,40,30,20
+-----------comm------------
+ct_transfer_comm:6.2932e+06
+conversion_comm:2.55598e+06
+other_nonlinear_comm:0
+total comm:8.84918e+06
+-----------latency------------
+ct_transfer_time:3.15276
+conversion_time:2.14164
+other_nonlinear_time:0
+he_compute_time:8.68741
+total time:13.9818
+-----------end profile------------
+--------linear part 1 done--------
+qk.size(): 262144
+qk_size:262144
+OK
+softmax packing time:0.195973
+OK2
+begin softmax_fix_he
+ell,s:40,20
+slots, num_cts:16384,16
+exp_he data copy time:0.00236034
+vec_x.size:262144
+in mpc_to_ckks, slot, Q, bitwidth, s_in, s_out:16384,12365743163379941377,40,20,40
+pts.size:16
+num of output cts:16
+bitwidth of output ct:1
+in ckks_to_mpc, degree, Q, bit_out, s_in, s_out:8192,1152921504598720513,40,40,20
+block 3 time:6.21276
+exp_he OK
+e_x_flat.size:262144
+sum_e_x.size:2048
+exp_he data time:0.000733991
+div_batch_he time:1.059e-06
+ret_flat.size:65536
+OK3
+-----------comm------------
+ct_transfer_comm:8.39093e+06
+conversion_comm:1.04862e+06
+other_nonlinear_comm:2.98624e+06
+total comm:1.24258e+07
+-----------latency------------
+ct_transfer_time:3.41189
+conversion_time:1.57565
+other_nonlinear_time:5.33997
+he_compute_time:1.22178
+total time:11.5493
+-----------end profile------------
+--------softmax done--------
+OK2
+in mpc_to_ckks, slot, Q, bitwidth, s_in, s_out:16384,5290801174847029249,40,20,43
+num of input cts:16
+recv_encrypted_vector
+OK3
+OK4
+OK5
+num_diag, num_matrix_per_col: 64 1
+packing_ind: 0
+packing_ind: 6
+packing_ind: packing_ind: packing_ind: packing_ind: packing_ind: 132
+
+57
+packing_ind: 4
+
+
+result.size(): 8
+softmax_v total time:5.19158
+OK6
+cts.size() * n1: 32
+cts.size() * n2, data.image_size * data.filter_w / data.slot_count, n1: 32,8,4
+bert_cp_bsgs_2 time:0.986355
+OK7
+OK1
+OK1
+OK2
+OK3
+h3.scale:52
+X_avg.scale:95
+OK4
+h3.scale:35
+OK5
+OK5
+OK5
+OK6
+block 4 time:7.04201
+num of output cts:9
+bitwidth of h3 ct:1
+bitwidth of X_sum2 ct:1
+h3.scale:35
+enc_sigma.scale:36
+send and receive done in linear4_add_layernorm_part1
+in ckks_to_mpc, degree, Q, bit_out, s_in, s_out:32768,1152921504592822273,40,35,20
+in ckks_to_mpc, degree, Q, bit_out, s_in, s_out:32768,1152921504592822273,40,36,20
+vec_sigma.size():1, should be 1
+bitwidth,s:40,20
+-----------comm------------
+ct_transfer_comm:2.62216e+06
+conversion_comm:344112
+other_nonlinear_comm:0
+total comm:2.96628e+06
+-----------latency------------
+ct_transfer_time:4.61108
+conversion_time:1.36797
+other_nonlinear_time:0
+he_compute_time:8.98656
+total time:14.9656
+-----------end profile------------
+--------linear part 2 done--------
+in layer_norm_nonlinear, bitwidth,s,num_ops,dim:40,20,128,1024
+sigma.size, should be L:128
+-----------comm------------
+ct_transfer_comm:0
+conversion_comm:0
+other_nonlinear_comm:0
+total comm:0
+-----------latency------------
+ct_transfer_time:0
+conversion_time:0
+other_nonlinear_time:0.00414075
+he_compute_time:0
+total time:0.00414075
+-----------end profile------------
+--------layer_norm_nonlinear done--------
+in ln_part2_linear3_gelu_part1, bitwidth,s:40,20
+should be 0! comm:0, round:0
+in mpc_to_ckks, slot, Q, bitwidth, s_in, s_out:16384,808101481108078593,40,20,46
+in mpc_to_ckks, slot, Q, bitwidth, s_in, s_out:16384,808101481108078593,40,20,46
+cts.size() * n1: 32
+cts.size() * n2, data.image_size * data.filter_w / data.slot_count, n1: 32,32,4
+bert_cp_bsgs_2 time:3.26878
+num_cts:32
+poly1~4 scale:
+76,7.55579e+22
+76,7.55579e+22
+76,7.55579e+22
+76,7.55579e+22
+part2 ok
+gelu poly time:1.07901
+eval_gelu_poly done
+in ckks_to_mpc, degree, Q, bit_out, s_in, s_out:32768,1152921504592822273,40,30,20
+-----------comm------------
+ct_transfer_comm:8.39093e+06
+conversion_comm:2.62152e+06
+other_nonlinear_comm:0
+total comm:1.10124e+07
+-----------latency------------
+ct_transfer_time:3.35386
+conversion_time:2.48121
+other_nonlinear_time:0
+he_compute_time:4.67668
+total time:10.5117
+-----------end profile------------
+--------linear part 3 done--------
+chunk_size, ell,s:524288,40,20
+gelu time:32.142
+-----------comm------------
+ct_transfer_comm:0
+conversion_comm:0
+other_nonlinear_comm:1.29362e+08
+total comm:1.29362e+08
+-----------latency------------
+ct_transfer_time:0
+conversion_time:0
+other_nonlinear_time:32.1515
+he_compute_time:0
+total time:32.1515
+-----------end profile------------
+--------gelu nonlinear done--------
+in linear4_add_layernorm_part1
+524288
+in mpc_to_ckks, slot, Q, bitwidth, s_in, s_out:8192,5476908422522503169,40,20,38
+num of input cts:64
+recv_encrypted_vector
+cts.size() * n1: 256
+cts.size() * n2, data.image_size * data.filter_w / data.slot_count, n1: 256,16,4
+bert_cp_bsgs_2 time:2.32488
+h7.size():16, should be:16
+scale:76
+OK1
+OK1
+OK2
+OK3
+h7.scale:76
+X_avg.scale:114
+OK4
+h7.scale:54
+OK5
+OK5
+OK5
+h7.size():16
+bitwidth of h7 ct:1
+bitwidth of X_sum2 ct:2
+h7.scale:20
+enc_sigma.scale:64
+send and receive done in linear4_add_layernorm_part1
+in ckks_to_mpc, degree, Q, bit_out, s_in, s_out:16384,1152921504604979201,40,20,20
+in ckks_to_mpc, degree, Q, bit_out, s_in, s_out:16384,1120833741659340801,40,64,20
+vec_sigma.size():1, should be 1
+bitwidth,s:40,20
+-----------comm------------
+ct_transfer_comm:2.52893e+06
+conversion_comm:2.20611e+06
+other_nonlinear_comm:0
+total comm:4.73504e+06
+-----------latency------------
+ct_transfer_time:3.62427
+conversion_time:2.65727
+other_nonlinear_time:0
+he_compute_time:3.44908
+total time:9.73062
+-----------end profile------------
+--------linear part 4 done--------
+-----------comm------------
+ct_transfer_comm:2.82261e+07
+conversion_comm:8.77635e+06
+other_nonlinear_comm:1.32348e+08
+total comm:1.6935e+08
+-----------round------------
+ct_transfer_round:10
+conversion_round:39
+other_nonlinear_round:40
+total round:89
+-----------time------------
+total time:94.2566
+ct_transfer_time:18.1539
+conversion_time:10.2237
+other_nonlinear_time:37.4979
+he_compute_time:27.0215
+other time:1.35958
