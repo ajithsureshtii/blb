@@ -1,0 +1,43 @@
+ARG BASE_IMAGE=blb-openfhe
+FROM ${BASE_IMAGE}
+
+# ── Python and ML dependencies (for BERT weight extraction) ───────────────────
+# transformers + datasets   : HuggingFace BERT weight export to .txt format
+# torch                     : required by transformers for weight loading
+# numpy, scipy              : numerical utilities used in bert.py
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    python3 \
+    python3-pip \
+    python3-venv \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+RUN pip3 install --no-cache-dir \
+    torch --index-url https://download.pytorch.org/whl/cpu \
+    transformers \
+    datasets \
+    numpy \
+    scipy \
+    --break-system-packages
+
+# ── Copy repo and build SCI ────────────────────────────────────────────────────
+# Copying to a separate path avoids collision with the live mount used during development.
+# SEAL 4.1.1 is auto-cloned and built by SCI's CMakeLists (extern/SEAL submodule).
+# OpenFHE is already installed system-wide from the base image (/usr/local).
+COPY . /root/blb
+WORKDIR /root/blb/SCI
+
+RUN mkdir -p build && cd build && \
+    cmake .. \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_INSTALL_PREFIX=./install \
+        -DBUILD_TESTS=ON \
+        -DOpenFHE_DIR=/usr/local/lib/cmake/OpenFHE && \
+    cmake --build . --parallel $(nproc) && \
+    cmake --install .
+
+WORKDIR /root/blb
+
+# Port 1234: default MPC two-party protocol port (Alice = server, Bob = client).
+EXPOSE 1234
+
+CMD ["bash"]
