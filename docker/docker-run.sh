@@ -1,45 +1,54 @@
 #!/bin/bash
 
 # ─────────────────────────────────────────
-# Configuration — edit these
-IMAGE_NAME="blb-openfhe"
-DOCKERFILE="docker/Dockerfile"
-DEV_IMAGE_NAME="blb-openfhe-dev"
-DEV_DOCKERFILE="docker/Dockerfile.dev"
-MOUNT_TARGET="/root/blb"     # path inside the container to mount into
-MPC_PORT="1234"              # two-party protocol port (Alice listens, Bob connects)
+# Image names
+SEAL_IMAGE="blb-seal"
+SEAL_DEV_IMAGE="blb-seal-dev"
+SEAL_DOCKERFILE="docker/Dockerfile.seal"
+SEAL_DEV_DOCKERFILE="docker/Dockerfile.seal.dev"
+
+OPENFHE_IMAGE="blb-openfhe"
+OPENFHE_DEV_IMAGE="blb-openfhe-dev"
+OPENFHE_DOCKERFILE="docker/Dockerfile"
+OPENFHE_DEV_DOCKERFILE="docker/Dockerfile.dev"
+
+MOUNT_TARGET="/root/blb"
+MPC_PORT="1234"
 # ─────────────────────────────────────────
 #
 # Usage:
-#   ./docker/docker-run.sh                          → run the base container (with mount)
-#   ./docker/docker-run.sh --build                  → build base image then run
-#   ./docker/docker-run.sh --dev                    → run the dev container
-#   ./docker/docker-run.sh --dev --build            → build dev image then run
-#   ./docker/docker-run.sh --image myimage          → run with a custom image name
-#   ./docker/docker-run.sh --no-mount               → run without mounting local directory
-#   ./docker/docker-run.sh --gpus                   → run with all GPUs
-#   ./docker/docker-run.sh --gpus 0                 → run with GPU device 0
-#   ./docker/docker-run.sh --party alice            → attach a second terminal as Alice (server)
-#   ./docker/docker-run.sh --party bob              → attach a second terminal as Bob (client)
+#   ./docker/docker-run.sh --backend seal                       → run SEAL base container
+#   ./docker/docker-run.sh --backend seal --dev                 → run SEAL dev container
+#   ./docker/docker-run.sh --backend seal --dev --build         → build SEAL dev image then run
+#   ./docker/docker-run.sh --backend openfhe                    → run OpenFHE base container
+#   ./docker/docker-run.sh --backend openfhe --dev              → run OpenFHE dev container
+#   ./docker/docker-run.sh --backend openfhe --dev --build      → build OpenFHE dev image then run
+#   ./docker/docker-run.sh --backend <seal|openfhe> --no-mount  → run without mounting local dir
+#   ./docker/docker-run.sh --backend <seal|openfhe> --gpus      → run with all GPUs
+#   ./docker/docker-run.sh --backend <seal|openfhe> --gpus 0    → run with GPU device 0
+#   ./docker/docker-run.sh --party bob --backend <seal|openfhe> → attach second MPC party terminal
 #
-# Two-party MPC workflow (two terminals on the same machine):
-#   Terminal 1:  ./docker/docker-run.sh --dev           (starts container, becomes Alice)
-#   Terminal 2:  ./docker/docker-run.sh --party bob     (attaches to same container as Bob)
+# Two-party MPC workflow (two terminals):
+#   Terminal 1:  ./docker/docker-run.sh --backend openfhe --dev
+#   Terminal 2:  ./docker/docker-run.sh --backend openfhe --party bob
+#
+# Side-by-side comparison:
+#   ./docker/docker-run.sh --backend seal    --dev   (SEAL version on port 1234)
+#   ./docker/docker-run.sh --backend openfhe --dev   (OpenFHE version on port 1235)
 #
 # ─────────────────────────────────────────
 
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-# Run from repo root regardless of where script is called from
 cd "${SCRIPT_DIR}/.."
 
 # Parse flags
 BUILD=false
 DEV=false
 NO_MOUNT=false
-CUSTOM_IMAGE=""
 PARTY=""
+BACKEND=""
 GPU_ARGS=()
 
 while [[ $# -gt 0 ]]; do
@@ -47,9 +56,9 @@ while [[ $# -gt 0 ]]; do
     --build) BUILD=true; shift ;;
     --dev) DEV=true; shift ;;
     --no-mount) NO_MOUNT=true; shift ;;
-    --image)
-      if [ -z "$2" ]; then echo "❌ --image requires a name"; exit 1; fi
-      CUSTOM_IMAGE="$2"; shift 2 ;;
+    --backend)
+      if [[ -z "$2" || "$2" == --* ]]; then echo "❌ --backend requires seal or openfhe"; exit 1; fi
+      BACKEND="$2"; shift 2 ;;
     --party)
       if [[ -z "$2" || "$2" == --* ]]; then echo "❌ --party requires alice or bob"; exit 1; fi
       PARTY="$2"; shift 2 ;;
@@ -61,14 +70,39 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-# ── Attach to a running container as a second party ───────────────────────────
+if [[ -z "$BACKEND" ]]; then
+  echo "❌ --backend is required. Use: --backend seal  or  --backend openfhe"
+  exit 1
+fi
+
+# ── Resolve names based on backend ────────────────────────────────────────────
+case "$BACKEND" in
+  seal)
+    BASE_IMAGE="$SEAL_IMAGE"
+    DEV_IMAGE="$SEAL_DEV_IMAGE"
+    BASE_DOCKERFILE="$SEAL_DOCKERFILE"
+    DEV_DOCKERFILE_PATH="$SEAL_DEV_DOCKERFILE"
+    HOST_PORT="$MPC_PORT"
+    ;;
+  openfhe)
+    BASE_IMAGE="$OPENFHE_IMAGE"
+    DEV_IMAGE="$OPENFHE_DEV_IMAGE"
+    BASE_DOCKERFILE="$OPENFHE_DOCKERFILE"
+    DEV_DOCKERFILE_PATH="$OPENFHE_DEV_DOCKERFILE"
+    # Use port 1235 so both backends can run simultaneously on the same host
+    HOST_PORT="1235"
+    ;;
+  *)
+    echo "❌ Unknown backend '$BACKEND'. Use seal or openfhe."
+    exit 1 ;;
+esac
+
+RESOLVED_IMAGE="$( [ "$DEV" = true ] && echo "$DEV_IMAGE" || echo "$BASE_IMAGE" )"
+RESOLVED_DOCKERFILE="$( [ "$DEV" = true ] && echo "$DEV_DOCKERFILE_PATH" || echo "$BASE_DOCKERFILE" )"
+CONTAINER_NAME="${RESOLVED_IMAGE}-container"
+
+# ── Attach second MPC party to a running container ────────────────────────────
 if [[ -n "$PARTY" ]]; then
-  if [[ "$DEV" == true ]]; then
-    TARGET_IMAGE="$DEV_IMAGE_NAME"
-  else
-    TARGET_IMAGE="${CUSTOM_IMAGE:-$IMAGE_NAME}"
-  fi
-  CONTAINER_NAME="${TARGET_IMAGE}-container"
   if ! docker container inspect "$CONTAINER_NAME" &>/dev/null; then
     echo "❌ Container '$CONTAINER_NAME' is not running. Start it first without --party."
     exit 1
@@ -78,43 +112,30 @@ if [[ -n "$PARTY" ]]; then
   exit 0
 fi
 
-# ── Resolve image name and dockerfile ─────────────────────────────────────────
-if [ -n "$CUSTOM_IMAGE" ]; then
-  RESOLVED_IMAGE="$CUSTOM_IMAGE"
-  RESOLVED_DOCKERFILE="$DOCKERFILE"
-elif [ "$DEV" = true ]; then
-  RESOLVED_IMAGE="$DEV_IMAGE_NAME"
-  RESOLVED_DOCKERFILE="$DEV_DOCKERFILE"
-else
-  RESOLVED_IMAGE="$IMAGE_NAME"
-  RESOLVED_DOCKERFILE="$DOCKERFILE"
-fi
-
-# If --dev and --build, ensure base image is built first
+# ── Build base image first if building dev ─────────────────────────────────────
 if [ "$DEV" = true ] && [ "$BUILD" = true ]; then
-  if ! docker image inspect "$IMAGE_NAME" &>/dev/null; then
-    echo "🔨 Base image '$IMAGE_NAME' not found. Building it first..."
-    docker build -t "$IMAGE_NAME" -f "$DOCKERFILE" .
-    echo "✅ Base image build complete."
+  if ! docker image inspect "$BASE_IMAGE" &>/dev/null; then
+    echo "🔨 Base image '$BASE_IMAGE' not found. Building it first..."
+    docker build -t "$BASE_IMAGE" -f "$BASE_DOCKERFILE" .
+    echo "✅ Base image built."
   fi
 fi
 
-# Build if requested
+# ── Build ──────────────────────────────────────────────────────────────────────
 if [ "$BUILD" = true ]; then
-  echo "🔨 Building Docker image '$RESOLVED_IMAGE' from $RESOLVED_DOCKERFILE..."
+  echo "🔨 Building '$RESOLVED_IMAGE' from $RESOLVED_DOCKERFILE..."
   docker build -t "$RESOLVED_IMAGE" -f "$RESOLVED_DOCKERFILE" \
-    --build-arg BASE_IMAGE="$IMAGE_NAME" .
+    --build-arg BASE_IMAGE="$BASE_IMAGE" .
   echo "✅ Build complete."
 fi
 
-# Check the image exists
 if ! docker image inspect "$RESOLVED_IMAGE" &>/dev/null; then
-  echo "❌ Image '$RESOLVED_IMAGE' not found. Run with --build first:"
-  echo "   ./docker/docker-run.sh --build${DEV:+ --dev}"
+  echo "❌ Image '$RESOLVED_IMAGE' not found. Run with --build first."
+  echo "   ./docker/docker-run.sh --backend $BACKEND${DEV:+ --dev} --build"
   exit 1
 fi
 
-# Build mount flag
+# ── Mount ──────────────────────────────────────────────────────────────────────
 if [ "$NO_MOUNT" = false ]; then
   MOUNT_FLAG="-v ${PWD}:${MOUNT_TARGET}"
   echo "📂 Mounting: $PWD → $MOUNT_TARGET"
@@ -123,29 +144,25 @@ else
   echo "📂 Running without mount."
 fi
 
-# Run the container
-CONTAINER_NAME="${RESOLVED_IMAGE}-container"
-echo "🐳 Container name: $CONTAINER_NAME"
-
+# ── Remove stale container ─────────────────────────────────────────────────────
 if docker container inspect "$CONTAINER_NAME" &>/dev/null; then
   read -r -p "⚠️  Container '$CONTAINER_NAME' already exists. Remove it and start fresh? [y/N] " confirm
   if [[ "$confirm" =~ ^[Yy]$ ]]; then
     docker rm -f "$CONTAINER_NAME"
     echo "🗑️  Old container removed."
   else
-    echo "❌ Aborted. Attach to it with: ./docker/docker-run.sh --party alice"
+    echo "ℹ️  Attach a second terminal with: ./docker/docker-run.sh --backend $BACKEND --party bob"
     exit 1
   fi
 fi
 
-if [ ${#GPU_ARGS[@]} -gt 0 ]; then
-  echo "🚀 Starting '$RESOLVED_IMAGE' with GPUs: ${GPU_ARGS[*]}..."
-else
-  echo "🚀 Starting '$RESOLVED_IMAGE'..."
-fi
+# ── Run ────────────────────────────────────────────────────────────────────────
+[ ${#GPU_ARGS[@]} -gt 0 ] && echo "🚀 Starting '$RESOLVED_IMAGE' [backend: $BACKEND] with GPUs: ${GPU_ARGS[*]}..." \
+                           || echo "🚀 Starting '$RESOLVED_IMAGE' [backend: $BACKEND]..."
+echo "🐳 Container: $CONTAINER_NAME   MPC port: $HOST_PORT → $MPC_PORT"
 
 docker run "${GPU_ARGS[@]}" -it \
   --name "$CONTAINER_NAME" \
-  -p ${MPC_PORT}:${MPC_PORT} \
+  -p ${HOST_PORT}:${MPC_PORT} \
   $MOUNT_FLAG \
   "$RESOLVED_IMAGE" /bin/bash
