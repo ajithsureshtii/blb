@@ -27,7 +27,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # ── Build and install OpenFHE ──────────────────────────────────────────────────
 # Pinned to v1.2.3 — check https://github.com/openfheorg/openfhe-development/releases
 # for the latest stable release and update the tag accordingly.
-ARG OPENFHE_TAG=v1.2.3
+ARG OPENFHE_TAG=v1.5.1
 RUN git clone --depth 1 --branch ${OPENFHE_TAG} \
         https://github.com/openfheorg/openfhe-development.git /tmp/openfhe && \
     cmake -S /tmp/openfhe -B /tmp/openfhe/build \
